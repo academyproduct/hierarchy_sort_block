@@ -1,0 +1,286 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: #16213e;
+  border-bottom: 2px solid #0f3460;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  color: #e94560;
+}
+
+.controls button {
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  background: #e94560;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.controls button:hover {
+  background: #c73e54;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  height: calc(100vh - 60px);
+}
+
+.panel {
+  background: #16213e;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.panel h2 {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  color: #a8dadc;
+}
+
+.panel .hint {
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 0.8rem;
+  line-height: 1.4;
+}
+
+/* ===== Pool ===== */
+#pool-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 80px;
+  padding: 0.5rem;
+  border: 2px dashed #333;
+  border-radius: 6px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#pool-container .image-card {
+  max-width: 100%;
+}
+
+#pool-container.drag-over {
+  border-color: #a8dadc;
+  background: rgba(168, 218, 220, 0.06);
+}
+
+#pool-container:empty::after {
+  content: "All images assigned — drag them back here to unassign";
+  display: block;
+  width: 100%;
+  text-align: center;
+  color: #555;
+  font-size: 0.7rem;
+  padding: 1.5rem 0.5rem;
+}
+
+/* ===== Image cards ===== */
+.image-card {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: grab;
+  border: 2px solid #333;
+  background: #0f3460;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.image-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
+}
+
+.image-card.dragging {
+  opacity: 0.4;
+  transform: scale(0.95);
+}
+
+.image-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+.image-card .label {
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 3px 6px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  max-height: 0;
+  padding: 0 6px;
+  opacity: 0;
+  transition: max-height 0.15s, padding 0.15s, opacity 0.15s;
+}
+
+.image-card:hover .label {
+  max-height: 2rem;
+  padding: 3px 6px;
+  opacity: 1;
+}
+
+/* ===== Hierarchy panel ===== */
+#hierarchy-container {
+  min-height: 100px;
+  padding: 0.6rem;
+  border: 2px dashed #333;
+  border-radius: 6px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#hierarchy-container.drag-over {
+  border-color: #e94560;
+  background: rgba(233, 69, 96, 0.04);
+}
+
+/* ===== Hierarchy nodes ===== */
+.hierarchy-node {
+  position: relative;
+  margin: 0;
+  padding: 0.3rem 0.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--node-color, #e94560);
+  border-radius: 0 6px 6px 0;
+  background: rgba(15, 52, 96, 0.35);
+}
+
+.hierarchy-node .node-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.hierarchy-node .node-header.node-drop-target {
+  border-color: var(--drop-color, #f4a261);
+  background: color-mix(in srgb, var(--drop-color, #f4a261) 12%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--drop-color, #f4a261) 30%, transparent);
+}
+
+.hierarchy-node .node-header .image-card {
+  max-width: 480px;
+}
+
+.hierarchy-node .node-header .node-label {
+  font-size: 0.8rem;
+  color: #a8dadc;
+  font-weight: 500;
+}
+
+.hierarchy-node .children-zone {
+  margin-left: 0.8rem;
+  padding-left: 0.4rem;
+  border-left: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+/* Depth-based coloring */
+.hierarchy-node[data-depth="0"] { --node-color: #e94560; }
+.hierarchy-node[data-depth="1"] { --node-color: #f4a261; }
+.hierarchy-node[data-depth="2"] { --node-color: #2a9d8f; }
+.hierarchy-node[data-depth="3"] { --node-color: #4287f5; }
+.hierarchy-node[data-depth="4"] { --node-color: #9b5de5; }
+.hierarchy-node[data-depth="5"] { --node-color: #00bbf9; }
+
+/* ===== Gap bars ===== */
+.gap-bar {
+  position: relative;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  cursor: default;
+  padding: 0 4px;
+}
+
+.gap-bar .gap-indicator {
+  --bar-color: #e94560;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: background 0.15s, height 0.15s, box-shadow 0.15s;
+}
+
+.gap-bar.gap-active .gap-indicator {
+  height: 4px;
+  background: var(--bar-color);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--bar-color) 60%, transparent);
+}
+
+.gap-bar.gap-active::after {
+  content: "Drop here";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  color: var(--bar-color, #e94560);
+  background: rgba(22, 33, 62, 0.95);
+  padding: 1px 6px;
+  border-radius: 3px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ===== Lightbox (click to zoom) ===== */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: zoom-out;
+  padding: 2rem;
+}
+
+.lightbox-overlay img {
+  max-width: 95vw;
+  max-height: 95vh;
+  border-radius: 6px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  main {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
